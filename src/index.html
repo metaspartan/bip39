@@ -15,7 +15,7 @@
         <div class="container">
 
             <h1 class="text-center">Mnemonic Code Converter</h1>
-            <p class="version">v0.3.3</p>
+            <p class="version">v0.3.4</p>
             <hr>
             <div class="row">
                 <div class="col-md-12">
@@ -94,6 +94,8 @@
                                     <div class="filtered col-sm-9 form-control-static"></div>
                                     <label class="col-sm-3 control-label">Raw Binary</label>
                                     <div class="binary col-sm-9 form-control-static"></div>
+                                    <label class="col-sm-3 control-label">Binary Checksum</label>
+                                    <div class="checksum col-sm-9 form-control-static">&nbsp;</div>
                                     <label class="col-sm-3 control-label">Word Indexes</label>
                                     <div class="word-indexes col-sm-9 form-control-static">&nbsp;</div>
                                     <label class="col-sm-3 control-label">Mnemonic Length</label>
@@ -141,6 +143,7 @@
                                     <a href="#chinese_traditional"  title="Chinese (Traditional)">中文(繁體)</a>
                                     <a href="#french"  title="French">Français</a>
                                     <a href="#italian"  title="Italian">Italiano</a>
+                                    <a href="#korean"  title="Korean">한국어</a>
                                 </div>
                             </div>
                         </div>
@@ -610,7 +613,7 @@
                             <span>Encrypt private keys using BIP38 and this password:</span>
                         </label>
                         <input class="bip38-password">
-                        <span>Enabling BIP38 means each key will take take several minutes to generate.</span>
+                        <span>Enabling BIP38 means each key will take several minutes to generate.</span>
                     </div>
                 </div>
                 <ul class="addresses-type nav nav-tabs" role="tablist">
@@ -713,6 +716,9 @@
                         <span>Be careful - it can be easy to make mistakes if you don't know what you're doing.</span>
                     </p>
                     <h3 id="entropy-notes">Entropy</h3>
+                    <p>
+                        <span>Entropy values should not include the BIP39 checksum. This is automatically added by the tool.</span>
+                    </p>
                     <p>
                         <span>
                             Entropy values must be sourced from a
@@ -895,6 +901,7 @@
         <script src="js/wordlist_chinese_traditional.js"></script>
         <script src="js/wordlist_french.js"></script>
         <script src="js/wordlist_italian.js"></script>
+        <script src="js/wordlist_korean.js"></script>
         <script src="js/jsbip39.js"></script>
         <script src="js/biginteger.js"></script>
         <script src="js/zxcvbn.js"></script>

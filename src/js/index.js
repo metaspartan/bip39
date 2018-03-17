@@ -38,6 +38,7 @@
     DOM.entropyWordCount = DOM.entropyContainer.find(".word-count");
     DOM.entropyBinary = DOM.entropyContainer.find(".binary");
     DOM.entropyWordIndexes = DOM.entropyContainer.find(".word-indexes");
+    DOM.entropyChecksum = DOM.entropyContainer.find(".checksum");
     DOM.entropyMnemonicLength = DOM.entropyContainer.find(".mnemonic-length");
     DOM.entropyFilterWarning = DOM.entropyContainer.find(".filter-warning");
     DOM.phrase = $(".phrase");
@@ -1141,7 +1142,7 @@
     function wordArrayToPhrase(words) {
         var phrase = words.join(" ");
         var language = getLanguageFromPhrase(phrase);
-        if (language == "japanese") {
+        if (language == "japanese" || language == "korean") {
             phrase = words.join("\u3000");
         }
         return phrase;
@@ -1195,6 +1196,8 @@
         DOM.phrase.val(phrase);
         // Show the word indexes
         showWordIndexes();
+        // Show the checksum
+        showChecksum();
     }
 
     function clearEntropyFeedback() {
@@ -1225,13 +1228,14 @@
         var entropyTypeStr = getEntropyTypeStr(entropy);
         var wordCount = Math.floor(numberOfBits / 32) * 3;
         var bitsPerEvent = entropy.bitsPerEvent.toFixed(2);
+        var spacedBinaryStr = addSpacesEveryElevenBits(entropy.binaryStr);
         DOM.entropyFiltered.html(entropy.cleanHtml);
         DOM.entropyType.text(entropyTypeStr);
         DOM.entropyCrackTime.text(timeToCrack);
         DOM.entropyEventCount.text(entropy.base.ints.length);
         DOM.entropyBits.text(numberOfBits);
         DOM.entropyWordCount.text(wordCount);
-        DOM.entropyBinary.text(entropy.binaryStr);
+        DOM.entropyBinary.text(spacedBinaryStr);
         DOM.entropyBitsPerEvent.text(bitsPerEvent);
         // detect and warn of filtering
         var rawNoSpaces = DOM.entropy.val().replace(/\s/g, "");
@@ -1456,6 +1460,35 @@
         DOM.entropyWordIndexes.text(wordIndexesStr);
     }
 
+    function showChecksum() {
+        var phrase = DOM.phrase.val();
+        var words = phraseToWordArray(phrase);
+        var checksumBitlength = words.length / 3;
+        var checksum = "";
+        var binaryStr = "";
+        var language = getLanguage();
+        for (var i=words.length-1; i>=0; i--) {
+            var word = words[i];
+            var wordIndex = WORDLISTS[language].indexOf(word);
+            var wordBinary = wordIndex.toString(2);
+            while (wordBinary.length < 11) {
+                wordBinary = "0" + wordBinary;
+            }
+            var binaryStr = wordBinary + binaryStr;
+            if (binaryStr.length >= checksumBitlength) {
+                var start = binaryStr.length - checksumBitlength;
+                var end = binaryStr.length;
+                checksum = binaryStr.substring(start, end);
+                // add spaces so the last group is 11 bits, not the first
+                checksum = checksum.split("").reverse().join("")
+                checksum = addSpacesEveryElevenBits(checksum);
+                checksum = checksum.split("").reverse().join("")
+                break;
+            }
+        }
+        DOM.entropyChecksum.text(checksum);
+    }
+
     function updateCsv() {
         var tableCsv = "path,address,public key,private key\n";
         var rows = DOM.addresses.find("tr");
@@ -1476,6 +1509,10 @@
         DOM.csv.val(tableCsv);
     }
 
+    function addSpacesEveryElevenBits(binaryStr) {
+        return binaryStr.match(/.{1,11}/g).join(" ");
+    }
+
     var networks = [
         {
             name: "AXE - Axe",
@@ -1492,6 +1529,14 @@
                 DOM.useBitpayAddressesContainer.removeClass("hidden");
                 setBitcoinCashNetworkValues();
                 setHdCoin(145);
+            },
+        },
+        {
+            name: "BLK - BlackCoin",
+            segwitAvailable: false,
+            onSelect: function() {
+                network = bitcoinjs.bitcoin.networks.blackcoin;
+                setHdCoin(10);
             },
         },
         {
@@ -1555,7 +1600,15 @@
             segwitAvailable: false,
             onSelect: function() {
                 network = bitcoinjs.bitcoin.networks.denarius;
-                setHdCoin(0);
+                setHdCoin(116);
+            },
+        },
+        {
+            name: "NEBL - Neblio",
+            segwitAvailable: false,
+            onSelect: function() {
+                network = bitcoinjs.bitcoin.networks.neblio;
+                setHdCoin(146);
             },
         },
         {
@@ -1742,7 +1795,7 @@
                 network = bitcoinjs.bitcoin.networks.bitcoin;
                 setHdCoin(144);
             },
-        }
+        },
     ]
 
     var clients = [

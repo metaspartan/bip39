@@ -426,7 +426,7 @@ it('Allows selection of dogecoin', function(done) {
 it('Allows selection of denarius', function(done) {
     var params = {
         selectText: "DNR - Denarius",
-        firstAddress: "D9feDKo88SHir79b2Kqhk7JAtaddmxDjNV",
+        firstAddress: "DFdFMVUMzU9xX88EywXvAGwjiwpxyh9vKb",
     };
     testNetwork(done, params);
 });
@@ -617,6 +617,13 @@ it('Allows selection of AXE', function(done) {
     var params = {
         selectText: "AXE - Axe",
         firstAddress: "XQ4HLxUVS3egk5ff1o9e2vJFJKSSsUH3B7",
+    };
+    testNetwork(done, params);
+});
+it('Allows selection of BlackCoin', function(done) {
+    var params = {
+        selectText: "BLK - BlackCoin",
+        firstAddress: "B5MznAKwj7uQ42vDz3w4onhBXPcqhTwJ9z",
     };
     testNetwork(done, params);
 });
@@ -2914,5 +2921,37 @@ it('Can encrypt private keys using BIP38', function(done) {
         }, ".address");
     });
 }, bip38delay + 5000);
+
+it('Shows the checksum for the entropy', function(done) {
+    driver.findElement(By.css('.use-entropy'))
+        .click();
+    driver.findElement(By.css('.entropy'))
+        .sendKeys("00000000000000000000000000000000");
+    driver.sleep(generateDelay).then(function() {
+        driver.findElement(By.css('.checksum'))
+            .getText()
+            .then(function(text) {
+                expect(text).toBe("1");
+                done();
+            });
+    });
+});
+
+it('Shows the checksum for the entropy with the correct groupings', function(done) {
+    driver.findElement(By.css('.use-entropy'))
+        .click();
+    // create a checksum of 20 bits, which spans multiple words
+    driver.findElement(By.css('.entropy'))
+        .sendKeys("F000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+    driver.sleep(generateDelay).then(function() {
+        driver.findElement(By.css('.checksum'))
+            .getText()
+            .then(function(text) {
+                // first group is 9 bits, second group is 11
+                expect(text).toBe("011010111 01110000110");
+                done();
+            });
+    });
+});
 
 });
